@@ -16,6 +16,23 @@ let paddleX = (canvas.width-paddleWidth) / 2;
 let rightPressed = false;
 let leftPressed = false;
 
+let brickRowCount = 3;
+let brickColumnCount = 5;
+let brickWidth = 75;
+let brickHeight = 20;
+let brickPadding = 10;
+let brickOffsetTop = 30;
+let brickOffsetLeft = 30;
+
+//set up array for bricks
+let bricks = [];
+for (let c=0; c < brickColumnCount; c++) {
+    bricks[c] = [];
+    for (let r=0; r < brickRowCount; r++) {
+        bricks[c][r] = { x: 0, y: 0 };
+    }
+}
+
 function drawBall() {
     ctx.beginPath();
     ctx.arc (x, y, ballRadius, 0, Math.PI*2);
@@ -32,9 +49,27 @@ function drawPaddle() {
     ctx.closePath();
 }
 
+function drawBricks() {
+    for(let c=0; c<brickColumnCount; c++) {
+        for(let r=0; r<brickRowCount; r++) {
+            let brickX = (c*(brickWidth+brickPadding))+brickOffsetLeft;
+            let brickY = (r*(brickHeight+brickPadding))+brickOffsetTop;
+            bricks[c][r].x = brickX;
+            bricks[c][r].x = brickY;
+            ctx.beginPath();
+            ctx.rect(brickX, brickY, brickWidth, brickHeight);
+            ctx.fillStyle = "black";
+            ctx.fill();
+            ctx.closePath();
+        }
+    }
+}
+
 function draw() {
     //clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    drawBricks();
 
     drawBall();
 
@@ -46,10 +81,18 @@ function draw() {
     if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
         dx = -dx;
     }
-    if (y + dy > canvas.height - ballRadius || y + dy < ballRadius) {
+    if (y + dy < ballRadius) { //ceiling check
         dy = -dy;
+    } else if (y + dy > canvas.height-ballRadius) { //floor check
+        if(x > paddleX && x < paddleX + paddleWidth) { //paddle check
+            dy = -dy;
+        } else { //it hit the floor}
+      alert("GAME OVER");
+      document.location.reload();
+      clearInterval(interval); //needed for brwoswer to end game
     }
-   
+}
+
     //paddle controls
     if(rightPressed) {
         paddleX += 7;
@@ -77,6 +120,17 @@ function keyDownHandler(e) {
     }
 }
 
+function collisionDetection() {
+    for (let c = 0; c < brickColumnCount; c++) {
+        for (let r = 0; r < brickRowCount; r++) {
+            let b = bricks[c][r];
+            if (x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
+                dy = -dy;
+            }
+        }
+    }
+}
+
 function keyUpHandler(e) {
     if(e.key == "Right" || e.key == "ArrowRight") {
         rightPressed = false;
@@ -89,4 +143,4 @@ function keyUpHandler(e) {
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 
-setInterval(draw, 10);
+let interval = setInterval(draw, 10);
