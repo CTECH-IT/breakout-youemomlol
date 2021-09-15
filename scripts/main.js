@@ -4,27 +4,29 @@ let ctx = canvas.getContext("2d");
 let x = canvas.width/2;
 let y = canvas.height-30;
 
-let dx = 10;
-let dy = -10;
+let dx = 7;
+let dy = -7;
 
 let ballRadius = 10;
 
 let paddleHeight = 10;
-let paddleWidth = 250;
+let paddleWidth = 200;
 let paddleX = (canvas.width-paddleWidth) / 2;
 
 let rightPressed = false;
 let leftPressed = false;
 
-let brickRowCount = 5;
-let brickColumnCount = 10;
-let brickWidth = 50;
+let brickRowCount = 6;
+let brickColumnCount = 5;
+let brickWidth = 85;
 let brickHeight = 20;
-let brickPadding = 10;
+let brickPadding = 3;
 let brickOffsetTop = 30;
-let brickOffsetLeft = 30;
+let brickOffsetLeft = 23;
 
 let score = 0;
+
+let lives = 3;
 
 //set up array for bricks
 let bricks = [];
@@ -38,7 +40,7 @@ for (let c=0; c < brickColumnCount; c++) {
 function drawBall() {
     ctx.beginPath();
     ctx.arc (x, y, ballRadius, 0, Math.PI*2);
-    ctx.fillStyle = "pink";
+    ctx.fillStyle = "purple";
     ctx.fill();
     ctx.closePath();
 }
@@ -88,9 +90,10 @@ function draw() {
     if (y + dy < ballRadius) { //ceiling check
         dy = -dy;
     } else if (y + dy > canvas.height-ballRadius) { //floor check
-        if(x > paddleX && x < paddleX + paddleWidth) { //paddle check
+        if (x > paddleX && x < paddleX + paddleWidth) { //paddle check
             dy = -dy;
-        } else { //it hit the floor}
+        } else { //it hit the floor
+            lives--;
       alert("GAME OVER");
       document.location.reload();
       clearInterval(interval); //needed for brwoswer to end game
@@ -117,6 +120,8 @@ function draw() {
 
     drawScore();
 
+    drawLives();
+
 }
 
 function keyDownHandler(e) {
@@ -138,6 +143,7 @@ function collisionDetection() {
                     b.show = false;
                     score++;
                     if(score == brickRowCount * brickColumnCount) {
+
                         alert("you win yayyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy");
                         document.location.reload();
                         clearInterval(interval);
@@ -151,7 +157,13 @@ function collisionDetection() {
 function drawScore() {
     ctx.font = "16px Arial";
     ctx.fillStyle = "black";
-    ctx.fillText("Score:" + score, 8, 20);
+    ctx.fillText("Score:" + score, 40, 20);
+}
+
+function drawLives() {
+    ctx.font = "16px Arial";
+    ctx.fillStyle = "black";
+    ctx.fillText("Lives:" + lives, 390, 20);
 }
 
 function keyUpHandler(e) {
