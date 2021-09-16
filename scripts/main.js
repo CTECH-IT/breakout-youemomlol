@@ -90,13 +90,16 @@ function draw() {
     if (y + dy < ballRadius) { //ceiling check
         dy = -dy;
     } else if (y + dy > canvas.height-ballRadius) { //floor check
+                dy = -dy
         if (x > paddleX && x < paddleX + paddleWidth) { //paddle check
-            dy = -dy;
+            dy = +dy;
         } else { //it hit the floor
             lives--;
-      alert("GAME OVER");
-      document.location.reload();
-      clearInterval(interval); //needed for brwoswer to end game
+            if(lives <= 0) { //lives check
+                alert("GAME OVER");
+                document.location.reload();
+                clearInterval(interval); //needed for brwoswer to end game
+            }
     }
 }
 
